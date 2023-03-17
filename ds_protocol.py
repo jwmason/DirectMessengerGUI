@@ -61,3 +61,18 @@ def server_response(resp):
     elif resp["response"]["type"] == "ok":
         send_return = True
     return send_return
+
+
+def directmessage(token, user_msg=None, user=None, messages=None):
+
+    if token and user_msg and user:
+        server_send = {"token":f"{token}", "directmessage": {"entry": f"{user_msg}","recipient":f"{user}", "timestamp": f"{Post(user_msg).get_time()}"}}
+    elif token and messages == 'new':
+        server_send = {"token":f"{token}", "directmessage": "new"}
+    elif token and messages == 'all':
+        server_send = {"token":f"{token}", "directmessage": "all"}
+        
+    return server_send
+    
+directmessage('a8b84d2b-6be6-4929-b308-c34bbc1151f8', "hi this is a test", 'masonwong1234')
+directmessage('a8b84d2b-6be6-4929-b308-c34bbc1151f8')
