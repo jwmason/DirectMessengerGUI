@@ -71,5 +71,4 @@ def directmessage(token, user=None, user_msg=None, messages=None):
         server_send = {"token":f"{token}", "directmessage": "new"}
     elif token and messages == 'all':
         server_send = {"token":f"{token}", "directmessage": "all"}
-        
     return server_send
