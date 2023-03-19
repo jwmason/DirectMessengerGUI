@@ -101,7 +101,7 @@ def send(server: str, port: int, username: str, password: str,
     print('\nServer Response:', resp)
     token = ds_protocol.extract_json(resp)[0]
     # test_dm1 =ds_protocol.directmessage(token, username, 'directmessage')
-    test_dm2 =ds_protocol.directmessage(token, username, 'directmessage', 'all')
+    test_dm2 =ds_protocol.directmessage(token, 'masonwong123', 'directmessage', 'all')
     # resp1 = server_send_and_receive(client, test_dm1)
     resp2 = server_send_and_receive(client, test_dm2)
     # print('\nServer Response:', resp1)
