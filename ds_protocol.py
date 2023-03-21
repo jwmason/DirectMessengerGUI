@@ -106,7 +106,7 @@ def server_response(resp):
 
 
 def directmessage(token, user=None, user_msg=None, messages=None):
-
+    """This function returns parameters into json direct messaging format"""
     if token and user_msg and user and messages is None:
         server_send = {"token":f"{token}", "directmessage": {"entry": f"{user_msg}","recipient":f"{user}", "timestamp": f"{Post(user_msg).get_time()}"}}
     elif token and messages == 'new':
