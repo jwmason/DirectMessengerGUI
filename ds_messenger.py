@@ -44,7 +44,6 @@ class DirectMessenger(DirectMessage):
   def send(self, message:str, recipient:str) -> bool:
     """Sends direct message and returns true if message successfully sent,
     false if send failed."""
-    user_dsu = Profile(recipient, message, self.username)
     try:
       client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
       client.connect((self.dsuserver, 3021))
@@ -103,7 +102,7 @@ class DirectMessenger(DirectMessage):
     client.close()
     return resp2
 
-# mason = DirectMessenger('168.235.86.101', 'masonjwong123')
+mason = DirectMessenger('168.235.86.101', 'masonwong123', 'password')
 # brandon = DirectMessenger('168.235.86.101', 'brandonsong', 'brandons')
 # brandon.send('hi this is brandon im sliding into yo dms', 'masonjwong123')
-# mason.retrieve_new()
+mason.retrieve_new()

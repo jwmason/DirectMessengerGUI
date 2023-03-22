@@ -1,5 +1,6 @@
 import tkinter as tk
-from tkinter import ttk, filedialog
+import json
+from tkinter import ttk, filedialog, simpledialog
 from typing import Text
 from ds_messenger import DirectMessenger
 
@@ -93,11 +94,10 @@ class Footer(tk.Frame):
             self._send_callback()
 
     def _draw(self):
-        save_button = tk.Button(master=self, text="Send", width=20)
+        save_button = tk.Button(master=self, text="Send", width=20, command=self.send_click)
         # You must implement this.
         # Here you must configure the button to bind its click to
         # the send_click() function.
-        save_button.configure(command=self.send_click())
         save_button.pack(fill=tk.BOTH, side=tk.RIGHT, padx=5, pady=5)
         self.footer_label = tk.Label(master=self, text="Ready.")
         self.footer_label.pack(fill=tk.BOTH, side=tk.LEFT, padx=5)
@@ -147,31 +147,38 @@ class MainApp(tk.Frame):
     def __init__(self, root):
         tk.Frame.__init__(self, root)
         self.root = root
-        self.username = None
-        self.password = None
-        self.server = None
-        self.recipient = None
+        self.username = 'GuestUser424'
+        self.password = 'test123'
+        self.server = '168.235.86.101'
+        self.recipient = 'masonwong123'
         # You must implement this! You must configure and
         # instantiate your DirectMessenger instance after this line.
         #self.direct_messenger = ... continue!
-        # self.direct_messenger = DirectMessenger('168.235.86.101', self.username, self.password)
+        self.direct_messenger = DirectMessenger(self.server, self.username, self.password)
         # After all initialization is complete,
         # call the _draw method to pack the widgets
         # into the root frame
         self._draw()
-        self.body.insert_contact("studentexw23") # adding one example student.
+        self.body.insert_contact("masonwong123") # adding one example student.
 
     def send_message(self):
         # You must implement this!
-        
-        pass
+        message = self.body.get_text_entry()
+        print(message)
+        if message and self.recipient:
+            success = self.direct_messenger.send(message, self.recipient)
+            if success:
+                self.body.insert_user_message(message)
+                self.body.set_text_entry("")
 
     def add_contact(self):
         # You must implement this!
         # Hint: check how to use tk.simpledialog.askstring to retrieve
         # the name of the new contact, and then use one of the body
         # methods to add the contact to your contact list
-        pass
+        name = simpledialog.askstring('Add Contact', 'Enter the name of the new contact:')
+        if name:
+            self.body.insert_contact(name)
 
     def recipient_selected(self, recipient):
         self.recipient = recipient
@@ -185,14 +192,21 @@ class MainApp(tk.Frame):
         # You must implement this!
         # You must configure and instantiate your
         # DirectMessenger instance after this line.
+        self.direct_messenger = DirectMessenger(self.server, self.username, self.password)
 
     def publish(self, message:str):
         # You must implement this!
-        pass
+        print(message)
+        if message:
+            self.direct_messenger.send(message, self.recipient)
 
     def check_new(self):
         # You must implement this!
-        pass
+        new_messages = self.direct_messenger.retrieve_new()
+        new_messages = json.loads(new_messages)
+        new_messages = new_messages['response']['messages']
+        for message in new_messages:
+            self.body.insert_user_message(str(message))
 
     def _draw(self):
         # Build a menu and add it to the root frame.
