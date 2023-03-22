@@ -97,9 +97,3 @@ class DirectMessenger(DirectMessage):
     print('\nServer Response:', resp2)
     client.close()
     return resp2
-
-test = DirectMessenger('168.235.86.101', 'masonwong123', 'password')
-# test_t_or_f = test.send("hi this is a test", "masonwong1234")
-# print(test_t_or_f)
-test_new = test.retrieve_new()
-test_all = test.retrieve_all()
