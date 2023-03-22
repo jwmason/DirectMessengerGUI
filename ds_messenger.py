@@ -5,14 +5,18 @@
 import socket
 import json
 import ds_protocol
+from Profile import Profile
 
 class DirectMessage:
+  """This class initiates the attributes
+  of a direct message"""
   def __init__(self, recipient = None, message = None, timestamp = None):
     self.recipient = recipient
     self.message = message
     self.timestamp = timestamp
 
 class DirectMessenger(DirectMessage):
+  """This class initiates the abiliyt to direct message"""
   def __init__(self, dsuserver=None, username=None, password=None):
     self.token = None
     self.dsuserver = dsuserver
@@ -40,6 +44,7 @@ class DirectMessenger(DirectMessage):
   def send(self, message:str, recipient:str) -> bool:
     """Sends direct message and returns true if message successfully sent,
     false if send failed."""
+    user_dsu = Profile(recipient, message, self.username)
     try:
       client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
       client.connect((self.dsuserver, 3021))
@@ -97,3 +102,8 @@ class DirectMessenger(DirectMessage):
     print('\nServer Response:', resp2)
     client.close()
     return resp2
+
+# mason = DirectMessenger('168.235.86.101', 'masonjwong123')
+# brandon = DirectMessenger('168.235.86.101', 'brandonsong', 'brandons')
+# brandon.send('hi this is brandon im sliding into yo dms', 'masonjwong123')
+# mason.retrieve_new()
