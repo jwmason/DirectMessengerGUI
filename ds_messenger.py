@@ -7,12 +7,12 @@ import json
 import ds_protocol
 
 class DirectMessage:
-  def __init__(self):
-    self.recipient = None
-    self.message = None
-    self.timestamp = None
+  def __init__(self, recipient = None, message = None, timestamp = None):
+    self.recipient = recipient
+    self.message = message
+    self.timestamp = timestamp
 
-class DirectMessenger:
+class DirectMessenger(DirectMessage):
   def __init__(self, dsuserver=None, username=None, password=None):
     self.token = None
     self.dsuserver = dsuserver
