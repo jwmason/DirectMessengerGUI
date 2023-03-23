@@ -152,7 +152,7 @@ class MainApp(tk.Frame):
         self.root = root
         self.username = simpledialog.askstring('Login', 'Enter username (can create one):')
         self.password = simpledialog.askstring('Login', 'Enter password (can create one):', show='*')
-        self.server = simpledialog.askstring('Login', 'Enter Server IP (can create one):')
+        self.server = simpledialog.askstring('Login', 'Enter Server IP:')
         if not self.server:
             self.server = None
         self.recipient = None
@@ -165,10 +165,10 @@ class MainApp(tk.Frame):
         current_file_path = file_path / file_name
         print(current_file_path)
         if current_file_path.exists():
-            self.profile = Profile(self.server, self.username, self.password)
+            self.profile = Profile(self.username, self.password)
             self.profile.load_profile(current_file_path)
         else:
-            self.profile = Profile(self.server, self.username, self.password)
+            self.profile = Profile(self.username, self.password)
             with open(current_file_path, 'x') as f:
                 pass
         with open(current_file_path, 'w') as f:
@@ -190,6 +190,7 @@ class MainApp(tk.Frame):
         print(message)
         if message and self.recipient:
             success = self.direct_messenger.send(message, self.recipient)
+            self.profile.sent_messages.append(message)
             if success:
                 self.body.insert_user_message(message)
                 self.body.set_text_entry("")
@@ -201,6 +202,7 @@ class MainApp(tk.Frame):
         # methods to add the contact to your contact list
         name = simpledialog.askstring('Add Contact', 'Enter the name of the new contact:')
         if name:
+            self.profile.friends.append(name)
             self.body.insert_contact(name)
 
     def recipient_selected(self, recipient):
@@ -216,6 +218,11 @@ class MainApp(tk.Frame):
         # You must configure and instantiate your
         # DirectMessenger instance after this line.
         self.direct_messenger = DirectMessenger(self.server, self.username, self.password)
+        self.profile = Profile(self.username, self.password)
+        file_path = pathlib.Path.cwd()
+        file_name = f'{self.username}.dsu'
+        current_file_path = file_path / file_name
+        self.profile.save_profile(current_file_path)
 
     def check_new(self):
         # You must implement this!
@@ -224,6 +231,8 @@ class MainApp(tk.Frame):
         new_messages = new_messages['response']['messages']
         for message in new_messages:
             self.body.insert_contact_message(str(message['message']))
+        self.root_check = tk.Tk()
+        self.root_check.after(1000, self.check_new)
 
     def _draw(self):
         # Build a menu and add it to the root frame.

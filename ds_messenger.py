@@ -111,8 +111,8 @@ class DirectMessenger:
     except (socket.error, TypeError, ConnectionRefusedError):
       return []
 
-mason = DirectMessenger('168.235.86.101', 'masonwong123', 'password')
+mason = DirectMessenger('168.235.86.101', 'mason', 'wong')
 # brandon = DirectMessenger('168.235.86.101', 'brandonsong', 'brandons')
 # brandon.send('hi this is brandon im sliding into yo dms', 'masonjwong123')
 mason.retrieve_new()
-mason.send('this is second test', 'mason')
+mason.send('this is third test', 'mason')
