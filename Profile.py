@@ -90,14 +90,12 @@ class Profile:
 
     """
 
-    def __init__(self, username=None, password=None, recipient=None, message=None, sender=None):
+    def __init__(self, username=None, password=None):
         """This initiates class"""
         self.username = username
         self.password = password
-        self.recipient = recipient
-        self.message = message
-        self.sender = sender
         self._messages = []
+        self.sent_messages = []
         self.friends = []
 
     def save_profile(self, path: str) -> None:
@@ -131,9 +129,3 @@ class Profile:
                 raise DsuProfileError(ex)
         else:
             raise DsuFileError()
-        
-    def add_friend(self, friend_username):
-        self.friends.append(friend_username)
-
-    def get_friends(self):
-        return self.friends

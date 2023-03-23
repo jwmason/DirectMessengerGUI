@@ -21,8 +21,10 @@ class Body(tk.Frame):
     def node_select(self, event):
         index = int(self.posts_tree.selection()[0])
         entry = self._contacts[index]
+        print(index, entry)
         if self._select_callback is not None:
             self._select_callback(entry)
+        print(self._select_callback)
 
     def insert_contact(self, contact: str):
         self._contacts.append(contact)
@@ -153,6 +155,9 @@ class MainApp(tk.Frame):
         self.username = simpledialog.askstring('Login', 'Enter username (can create one):')
         self.password = simpledialog.askstring('Login', 'Enter password (can create one):', show='*')
         self.server = simpledialog.askstring('Login', 'Enter Server IP:')
+        self.username = 'masonwongjohn'
+        self.password = 'password'
+        self.server = '168.235.86.101'
         if not self.server:
             self.server = None
         self.recipient = None
@@ -163,6 +168,7 @@ class MainApp(tk.Frame):
         file_path = pathlib.Path.cwd()
         file_name = f'{self.username}.dsu'
         current_file_path = file_path / file_name
+        self.current_file_path = file_path / file_name
         print(current_file_path)
         if current_file_path.exists():
             self.profile = Profile(self.username, self.password)
@@ -201,12 +207,15 @@ class MainApp(tk.Frame):
         # the name of the new contact, and then use one of the body
         # methods to add the contact to your contact list
         name = simpledialog.askstring('Add Contact', 'Enter the name of the new contact:')
-        if name:
+        if name and name not in self.profile.friends:
             self.profile.friends.append(name)
             self.body.insert_contact(name)
 
     def recipient_selected(self, recipient):
         self.recipient = recipient
+        if self.recipient is not None:
+            self.check_all()
+            self.recipient = None
 
     def configure_server(self):
         ud = NewContactDialog(self.root, "Configure Account",
@@ -222,6 +231,21 @@ class MainApp(tk.Frame):
         file_path = pathlib.Path.cwd()
         file_name = f'{self.username}.dsu'
         current_file_path = file_path / file_name
+        self.current_file_path = file_path / file_name
+        if current_file_path.exists():
+            self.profile = Profile(self.username, self.password)
+            self.profile.load_profile(current_file_path)
+        else:
+            self.profile = Profile(self.username, self.password)
+            with open(current_file_path, 'x') as f:
+                pass
+        with open(current_file_path, 'w') as f:
+            self.direct_messenger_local = DirectMessenger('168.235.86.101', self.username, self.password)
+            content = self.direct_messenger_local.retrieve_all()
+            content_dict = json.loads(content)
+            print(content_dict)
+            for message in content_dict['response']['messages']:
+                self.profile._messages.append(message)
         self.profile.save_profile(current_file_path)
 
     def check_new(self):
@@ -229,9 +253,28 @@ class MainApp(tk.Frame):
         new_messages = self.direct_messenger.retrieve_new()
         new_messages = json.loads(new_messages)
         new_messages = new_messages['response']['messages']
+        print(new_messages)
         for message in new_messages:
-            self.body.insert_contact_message(str(message['message']))
+            contact = str(message['from'])
+            if contact not in self.profile.friends:
+                self.profile.friends.append(contact)
+                self.profile.save_profile(self.current_file_path)
+                self.body.insert_contact(str(message['from']))
         self.root.after(1000, self.check_new)
+
+    def check_all(self):
+        self.body.entry_editor.delete('1.0', tk.END)
+        old_messages = self.direct_messenger.retrieve_all()
+        old_messages = json.loads(old_messages)
+        old_messages = old_messages['response']['messages']
+        for message in old_messages:
+            contact = str(message['from'])
+            print('This is contact', contact)
+            print('This is recipient', self.recipient)
+            print(contact == self.recipient)
+            if contact == self.recipient:
+                print('same')
+                self.body.insert_contact_message(str(message['message']))
 
     def _draw(self):
         # Build a menu and add it to the root frame.
