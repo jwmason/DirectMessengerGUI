@@ -90,8 +90,9 @@ class Profile:
 
     """
 
-    def __init__(self, recipient=None, message=None, sender=None):
+    def __init__(self, path=None, recipient=None, message=None, sender=None):
         """This initiates class"""
+        self.path = path
         self.recipient = recipient
         self.message = message
         self.sender = sender
@@ -117,12 +118,13 @@ class Profile:
 
         if p.exists() and p.suffix == '.dsu':
             try:
-                f = open(p, 'r')
-                obj = json.load(f)
-                self.recipient = obj['recipient']
-                self.message = obj['message']
-                self.sender = obj['sender']
-                f.close()
+                for message in self._messages:
+                    f = open(p, 'r')
+                    obj = json.load(f)
+                    self.recipient = obj['recipient']
+                    self.message = obj['message']
+                    self.sender = obj['sender']
+                    f.close()
             except Exception as ex:
                 raise DsuProfileError(ex)
         else:

@@ -16,7 +16,7 @@ class DirectMessage:
     self.timestamp = timestamp
 
 class DirectMessenger(DirectMessage):
-  """This class initiates the abiliyt to direct message"""
+  """This class initiates the abiliy to direct message"""
   def __init__(self, dsuserver=None, username=None, password=None):
     self.token = None
     self.dsuserver = dsuserver
@@ -49,6 +49,8 @@ class DirectMessenger(DirectMessage):
       client.connect((self.dsuserver, 3021))
 
       msg = ds_protocol.directmessage(self.token, recipient, message)
+      timestamp = msg['directmessage']['timestamp']
+      dm = DirectMessage(recipient, message, timestamp)
 
       send2 = client.makefile('w')
       recv2 = client.makefile('r')
@@ -59,6 +61,7 @@ class DirectMessenger(DirectMessage):
       resp2 = recv2.readline()[:-1]
 
       print('\nServer Response:', resp2)
+      dm = DirectMessage(recipient, message, )
       client.close()
       return True
     except (socket.error, TypeError, ConnectionRefusedError):
@@ -80,6 +83,7 @@ class DirectMessenger(DirectMessage):
     resp2 = recv2.readline()[:-1]
 
     print('\nServer Response:', resp2)
+
     client.close()
     return resp2
  
@@ -102,7 +106,8 @@ class DirectMessenger(DirectMessage):
     client.close()
     return resp2
 
-mason = DirectMessenger('168.235.86.101', 'masonwong123', 'password')
+mason = DirectMessenger('168.235.86.101', 'GuestUser4242', 'password')
 # brandon = DirectMessenger('168.235.86.101', 'brandonsong', 'brandons')
 # brandon.send('hi this is brandon im sliding into yo dms', 'masonjwong123')
 mason.retrieve_new()
+# mason.send('this is second test', 'GuestUser424')

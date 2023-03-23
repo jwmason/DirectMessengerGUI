@@ -147,10 +147,10 @@ class MainApp(tk.Frame):
     def __init__(self, root):
         tk.Frame.__init__(self, root)
         self.root = root
-        self.username = 'GuestUser424'
-        self.password = 'test123'
+        self.username = simpledialog.askstring('Login', 'Enter username (can create one):')
+        self.password = simpledialog.askstring('Login', 'Enter password (can create one):', show='*')
         self.server = '168.235.86.101'
-        self.recipient = 'masonwong123'
+        self.recipient = 'masonwong12345'
         # You must implement this! You must configure and
         # instantiate your DirectMessenger instance after this line.
         #self.direct_messenger = ... continue!
@@ -159,7 +159,6 @@ class MainApp(tk.Frame):
         # call the _draw method to pack the widgets
         # into the root frame
         self._draw()
-        self.body.insert_contact("masonwong123") # adding one example student.
 
     def send_message(self):
         # You must implement this!
@@ -194,19 +193,13 @@ class MainApp(tk.Frame):
         # DirectMessenger instance after this line.
         self.direct_messenger = DirectMessenger(self.server, self.username, self.password)
 
-    def publish(self, message:str):
-        # You must implement this!
-        print(message)
-        if message:
-            self.direct_messenger.send(message, self.recipient)
-
     def check_new(self):
         # You must implement this!
         new_messages = self.direct_messenger.retrieve_new()
         new_messages = json.loads(new_messages)
         new_messages = new_messages['response']['messages']
         for message in new_messages:
-            self.body.insert_user_message(str(message))
+            self.body.insert_contact_message(str(message['message']))
 
     def _draw(self):
         # Build a menu and add it to the root frame.
