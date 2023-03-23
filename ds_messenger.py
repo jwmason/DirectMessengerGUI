@@ -5,7 +5,6 @@
 import socket
 import json
 import ds_protocol
-from Profile import Profile
 
 class DirectMessage:
   """This class initiates the attributes
@@ -15,29 +14,30 @@ class DirectMessage:
     self.message = message
     self.timestamp = timestamp
 
-class DirectMessenger(DirectMessage):
+class DirectMessenger:
   """This class initiates the abiliy to direct message"""
   def __init__(self, dsuserver=None, username=None, password=None):
     self.token = None
     self.dsuserver = dsuserver
     self.username = username
-    self.password = password
+    self.password = password   
     try:
-      client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-      client.connect((self.dsuserver, 3021))
-      msg = ds_protocol.join(self.username, self.password)
+      if self.dsuserver:
+        client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        client.connect((self.dsuserver, 3021))
+        msg = ds_protocol.join(self.username, self.password)
 
-      send = client.makefile('w')
-      recv = client.makefile('r')
+        send = client.makefile('w')
+        recv = client.makefile('r')
 
-      msg = json.dumps(msg)
-      send.write(msg)
-      send.flush()
-      resp = recv.readline()[:-1]
+        msg = json.dumps(msg)
+        send.write(msg)
+        send.flush()
+        resp = recv.readline()[:-1]
 
-      print('\nServer Response:', resp)
-      self.token = ds_protocol.extract_json(resp)[0]
-      client.close()
+        print('\nServer Response:', resp)
+        self.token = ds_protocol.extract_json(resp)[0]
+        client.close()
     except (ValueError, ConnectionRefusedError, socket.error):
       raise ValueError("Error")
 
@@ -45,69 +45,78 @@ class DirectMessenger(DirectMessage):
     """Sends direct message and returns true if message successfully sent,
     false if send failed."""
     try:
-      client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-      client.connect((self.dsuserver, 3021))
+      if self.dsuserver:
+        client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        client.connect((self.dsuserver, 3021))
 
-      msg = ds_protocol.directmessage(self.token, recipient, message)
-      timestamp = msg['directmessage']['timestamp']
-      dm = DirectMessage(recipient, message, timestamp)
+        msg = ds_protocol.directmessage(self.token, recipient, message)
+        timestamp = msg['directmessage']['timestamp']
+        send2 = client.makefile('w')
+        recv2 = client.makefile('r')
+    
+        msg = json.dumps(msg)
+        send2.write(msg)
+        send2.flush()
+        resp2 = recv2.readline()[:-1]
 
-      send2 = client.makefile('w')
-      recv2 = client.makefile('r')
-  
-      msg = json.dumps(msg)
-      send2.write(msg)
-      send2.flush()
-      resp2 = recv2.readline()[:-1]
-
-      print('\nServer Response:', resp2)
-      dm = DirectMessage(recipient, message, )
-      client.close()
-      return True
+        print('\nServer Response:', resp2)
+        dm = DirectMessage(recipient, message, )
+        client.close()
+        return True
     except (socket.error, TypeError, ConnectionRefusedError):
       return False
 		
   def retrieve_new(self) -> list:
     """Returns a list of DirectMessage objects containing all new messages"""
-    client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    client.connect((self.dsuserver, 3021))
+    try:
+      if self.dsuserver:
+        client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        client.connect((self.dsuserver, 3021))
 
-    msg = ds_protocol.directmessage(self.token, messages = 'new')
+        msg = ds_protocol.directmessage(self.token, messages = 'new')
 
-    send2 = client.makefile('w')
-    recv2 = client.makefile('r')
+        send2 = client.makefile('w')
+        recv2 = client.makefile('r')
 
-    msg = json.dumps(msg)
-    send2.write(msg)
-    send2.flush()
-    resp2 = recv2.readline()[:-1]
+        msg = json.dumps(msg)
+        send2.write(msg)
+        send2.flush()
+        resp2 = recv2.readline()[:-1]
 
-    print('\nServer Response:', resp2)
+        print('\nServer Response:', resp2)
 
-    client.close()
-    return resp2
+        client.close()
+        return resp2
+    except (socket.error, TypeError, ConnectionRefusedError):
+      return []
  
   def retrieve_all(self) -> list:
     """Returns a list of DirectMessage objects containing all messages"""
-    client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    client.connect((self.dsuserver, 3021))
+    try:
+      if self.dsuserver:
+        client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        client.connect((self.dsuserver, 3021))
 
-    msg = ds_protocol.directmessage(self.token, messages = 'all')
+        msg = ds_protocol.directmessage(self.token, messages = 'all')
 
-    send2 = client.makefile('w')
-    recv2 = client.makefile('r')
+        send2 = client.makefile('w')
+        recv2 = client.makefile('r')
 
-    msg = json.dumps(msg)
-    send2.write(msg)
-    send2.flush()
-    resp2 = recv2.readline()[:-1]
+        msg = json.dumps(msg)
+        send2.write(msg)
+        send2.flush()
+        resp2 = recv2.readline()[:-1]
 
-    print('\nServer Response:', resp2)
-    client.close()
-    return resp2
+        print('\nServer Response:', resp2)
+        client.close()
+        return resp2
+    except (socket.error, TypeError, ConnectionRefusedError):
+      return []
 
-mason = DirectMessenger('168.235.86.101', 'GuestUser4242', 'password')
+mason = DirectMessenger(username='GuestUser4242',password='password')
 # brandon = DirectMessenger('168.235.86.101', 'brandonsong', 'brandons')
 # brandon.send('hi this is brandon im sliding into yo dms', 'masonjwong123')
 mason.retrieve_new()
+test = mason.send('message', 'masonwong123')
+print(test)
 # mason.send('this is second test', 'GuestUser424')

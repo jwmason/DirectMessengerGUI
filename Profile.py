@@ -97,6 +97,7 @@ class Profile:
         self.message = message
         self.sender = sender
         self._messages = []
+        self.friends = []
 
     def save_profile(self, path: str) -> None:
         """This saves profile"""
@@ -129,3 +130,9 @@ class Profile:
                 raise DsuProfileError(ex)
         else:
             raise DsuFileError()
+        
+    def add_friend(self, friend_username):
+        self.friends.append(friend_username)
+
+    def get_friends(self):
+        return self.friends
