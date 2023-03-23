@@ -90,9 +90,10 @@ class Profile:
 
     """
 
-    def __init__(self, path=None, recipient=None, message=None, sender=None):
+    def __init__(self, username=None, password=None, recipient=None, message=None, sender=None):
         """This initiates class"""
-        self.path = path
+        self.username = username
+        self.password = password
         self.recipient = recipient
         self.message = message
         self.sender = sender

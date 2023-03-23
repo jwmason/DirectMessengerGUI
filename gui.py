@@ -3,6 +3,9 @@ import json
 from tkinter import ttk, filedialog, simpledialog
 from typing import Text
 from ds_messenger import DirectMessenger
+from Profile import Profile
+import pathlib
+import os.path
 
 class Body(tk.Frame):
     def __init__(self, root, recipient_selected_callback=None):
@@ -149,12 +152,33 @@ class MainApp(tk.Frame):
         self.root = root
         self.username = simpledialog.askstring('Login', 'Enter username (can create one):')
         self.password = simpledialog.askstring('Login', 'Enter password (can create one):', show='*')
-        self.server = '168.235.86.101'
-        self.recipient = 'masonwong12345'
+        self.server = simpledialog.askstring('Login', 'Enter Server IP (can create one):')
+        if not self.server:
+            self.server = None
+        self.recipient = None
         # You must implement this! You must configure and
         # instantiate your DirectMessenger instance after this line.
         #self.direct_messenger = ... continue!
         self.direct_messenger = DirectMessenger(self.server, self.username, self.password)
+        file_path = pathlib.Path.cwd()
+        file_name = f'{self.username}.dsu'
+        current_file_path = file_path / file_name
+        print(current_file_path)
+        if current_file_path.exists():
+            self.profile = Profile(self.server, self.username, self.password)
+            self.profile.load_profile(current_file_path)
+        else:
+            self.profile = Profile(self.server, self.username, self.password)
+            with open(current_file_path, 'x') as f:
+                pass
+        with open(current_file_path, 'w') as f:
+            self.direct_messenger_local = DirectMessenger('168.235.86.101', self.username, self.password)
+            content = self.direct_messenger_local.retrieve_all()
+            content_dict = json.loads(content)
+            print(content_dict)
+            for message in content_dict['response']['messages']:
+                self.profile._messages.append(message)
+        self.profile.save_profile(current_file_path)
         # After all initialization is complete,
         # call the _draw method to pack the widgets
         # into the root frame
@@ -228,7 +252,7 @@ class MainApp(tk.Frame):
         self.footer.pack(fill=tk.BOTH, side=tk.BOTTOM)
 
 
-if __name__ == "__main__":
+def run():
     # All Tkinter programs start with a root window. We will name ours 'main'.
     main = tk.Tk()
 

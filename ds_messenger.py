@@ -39,7 +39,7 @@ class DirectMessenger:
         self.token = ds_protocol.extract_json(resp)[0]
         client.close()
     except (ValueError, ConnectionRefusedError, socket.error):
-      raise ValueError("Error")
+      return []
 
   def send(self, message:str, recipient:str) -> bool:
     """Sends direct message and returns true if message successfully sent,
@@ -60,7 +60,6 @@ class DirectMessenger:
         resp2 = recv2.readline()[:-1]
 
         print('\nServer Response:', resp2)
-        dm = DirectMessage(recipient, message, )
         client.close()
         return True
     except (socket.error, TypeError, ConnectionRefusedError):
@@ -84,7 +83,6 @@ class DirectMessenger:
         resp2 = recv2.readline()[:-1]
 
         print('\nServer Response:', resp2)
-
         client.close()
         return resp2
     except (socket.error, TypeError, ConnectionRefusedError):
@@ -113,10 +111,8 @@ class DirectMessenger:
     except (socket.error, TypeError, ConnectionRefusedError):
       return []
 
-mason = DirectMessenger(username='GuestUser4242',password='password')
+mason = DirectMessenger('168.235.86.101', 'masonwong123', 'password')
 # brandon = DirectMessenger('168.235.86.101', 'brandonsong', 'brandons')
 # brandon.send('hi this is brandon im sliding into yo dms', 'masonjwong123')
 mason.retrieve_new()
-test = mason.send('message', 'masonwong123')
-print(test)
-# mason.send('this is second test', 'GuestUser424')
+mason.send('this is second test', 'mason')
