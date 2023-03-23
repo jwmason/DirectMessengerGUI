@@ -20,20 +20,19 @@ class TestDirectMessenger(unittest.TestCase):
     def setUp(self):
         """Sets up a test direct message"""
         self.dm = DirectMessenger(dsuserver="168.235.86.101", username="masonwong123", password="password")
-        self.dm2 = DirectMessenger(dsuserver="168.235.86.101", username="masonwong12345", password="password")
 
     def test_send_message(self):
         """This tests the send function"""
-        recipient = "masonwong12345"
+        recipient = "masonwong12"
         message = "test message"
         self.assertTrue(self.dm.send(message, recipient))
 
     def test_retrieve_new(self):
         """This tests retrieving new messages"""
-        recipient = "masonwong12345"
+        recipient = "masonwong12"
         message = "test message"
         self.dm.send(message, recipient)
-        messages = self.dm2.retrieve_new()
+        messages = self.dm.retrieve_new()
         self.assertTrue(messages, {"response": {"type": "ok", "messages": []}})
         self.assertTrue(messages, DirectMessage)
 
@@ -44,7 +43,7 @@ class TestDirectMessenger(unittest.TestCase):
         message2 = "test message 2"
         self.dm.send(message1, recipient)
         self.dm.send(message2, recipient)
-        messages = self.dm2.retrieve_all()
+        messages = self.dm.retrieve_all()
         self.assertTrue(messages, {"response": {"type": "ok", "messages": []}})
         self.assertTrue(messages, DirectMessage)
 

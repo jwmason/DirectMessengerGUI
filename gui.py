@@ -231,8 +231,7 @@ class MainApp(tk.Frame):
         new_messages = new_messages['response']['messages']
         for message in new_messages:
             self.body.insert_contact_message(str(message['message']))
-        self.root_check = tk.Tk()
-        self.root_check.after(1000, self.check_new)
+        self.root.after(1000, self.check_new)
 
     def _draw(self):
         # Build a menu and add it to the root frame.
