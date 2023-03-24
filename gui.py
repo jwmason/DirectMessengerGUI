@@ -155,7 +155,7 @@ class MainApp(tk.Frame):
         self.username = simpledialog.askstring('Login', 'Enter username (can create one):')
         self.password = simpledialog.askstring('Login', 'Enter password (can create one):', show='*')
         self.server = simpledialog.askstring('Login', 'Enter Server IP:')
-        self.username = 'masonwongjohn'
+        self.username = 'masonwongjohn1'
         self.password = 'password'
         self.server = '168.235.86.101'
         if not self.server:
@@ -189,12 +189,14 @@ class MainApp(tk.Frame):
         # call the _draw method to pack the widgets
         # into the root frame
         self._draw()
+        self.check_all()
 
     def send_message(self):
         # You must implement this!
         message = self.body.get_text_entry()
         print(message)
         if message and self.recipient:
+            print('message and recipient')
             success = self.direct_messenger.send(message, self.recipient)
             self.profile.sent_messages.append(message)
             if success:
@@ -215,7 +217,6 @@ class MainApp(tk.Frame):
         self.recipient = recipient
         if self.recipient is not None:
             self.check_all()
-            self.recipient = None
 
     def configure_server(self):
         ud = NewContactDialog(self.root, "Configure Account",
@@ -253,7 +254,6 @@ class MainApp(tk.Frame):
         new_messages = self.direct_messenger.retrieve_new()
         new_messages = json.loads(new_messages)
         new_messages = new_messages['response']['messages']
-        print(new_messages)
         for message in new_messages:
             contact = str(message['from'])
             if contact not in self.profile.friends:
@@ -264,17 +264,50 @@ class MainApp(tk.Frame):
 
     def check_all(self):
         self.body.entry_editor.delete('1.0', tk.END)
-        old_messages = self.direct_messenger.retrieve_all()
-        old_messages = json.loads(old_messages)
-        old_messages = old_messages['response']['messages']
-        for message in old_messages:
-            contact = str(message['from'])
-            print('This is contact', contact)
-            print('This is recipient', self.recipient)
-            print(contact == self.recipient)
+        # old_messages = self.direct_messenger.retrieve_all()
+        # old_messages = json.loads(old_messages)
+        # old_messages = old_messages['response']['messages']
+        old_messages = self.get_local_list()
+        if self.recipient is None:
+            for i in range(len(old_messages)):
+                contact = old_messages[i]['from']
+                if contact not in self.profile.friends:
+                    self.body.insert_contact(contact)
+                    self.profile.friends.append(contact)
+                    self.profile.save_profile(self.current_file_path)
+        for i in range(len(old_messages)):
+            contact = old_messages[i]['from']
+            print(contact)
+            print(self.recipient)
             if contact == self.recipient:
-                print('same')
-                self.body.insert_contact_message(str(message['message']))
+                if contact not in self.profile.friends:
+                    self.body.insert_contact(contact)
+                    self.profile.friends.append(contact)
+                    self.profile.save_profile(self.current_file_path)
+                self.body.insert_contact_message(old_messages[i]['message'])
+
+    # def get_local_list(self):
+    #     print(self.current_file_path)
+    #     self.profile.load_profile(pathlib.Path(self.current_file_path))
+    #     my_list = self.profile._messages
+    #     print(my_list)
+    #     my_dict = {}
+    #     for item in my_list:
+    #         message = item['message']
+    #         sender = item['from']
+    #         my_dict[sender] = message
+    #     return my_dict
+    def get_local_list(self):
+        print(self.current_file_path)
+        self.profile.load_profile(pathlib.Path(self.current_file_path))
+        my_list = self.profile._messages
+        print(my_list)
+        my_dicts = []
+        for item in my_list:
+            message = item['message']
+            sender = item['from']
+            my_dicts.append({'message': message, 'from': sender})
+        return my_dicts
 
     def _draw(self):
         # Build a menu and add it to the root frame.
