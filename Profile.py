@@ -116,13 +116,6 @@ class Profile:
         my_path = Path(path)
 
         if my_path.exists() and my_path.suffix == '.dsu':
-            for message in self._messages:
-                with open(my_path, 'r') as myfile:
-                    obj = json.load(myfile)
-                    self.friends.append(obj['_messages'][0]['from'])
-                    self._messages.append(obj['_messages'][0]['message'])
-            for message in self.friends:
-                with open(my_path, 'r') as myfile:
-                    self.sent_messages.append(message)
+            pass
         else:
             raise DsuFileError()

@@ -13,6 +13,7 @@ class DirectMessage:
     """This class initiates the attributes
     of a direct message"""
     def __init__(self, recipient=None, message=None, timestamp=None):
+        """This initiates th attributes"""
         self.recipient = recipient
         self.message = message
         self.timestamp = timestamp
