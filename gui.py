@@ -16,15 +16,14 @@ class Body(tk.Frame):
         # After all initialization is complete,
         # call the _draw method to pack the widgets
         # into the Body instance
+        self.configure(background="#F0F0F0")
         self._draw()
 
     def node_select(self, event):
         index = int(self.posts_tree.selection()[0])
         entry = self._contacts[index]
-        print(index, entry)
         if self._select_callback is not None:
             self._select_callback(entry)
-        print(self._select_callback)
 
     def insert_contact(self, contact: str):
         self._contacts.append(contact)
@@ -50,7 +49,7 @@ class Body(tk.Frame):
         self.message_editor.insert(1.0, text)
 
     def _draw(self):
-        posts_frame = tk.Frame(master=self, width=250)
+        posts_frame = tk.Frame(master=self, width=250, background='blue')
         posts_frame.pack(fill=tk.BOTH, side=tk.LEFT)
 
         self.posts_tree = ttk.Treeview(posts_frame)
@@ -64,7 +63,7 @@ class Body(tk.Frame):
         editor_frame = tk.Frame(master=entry_frame, bg="red")
         editor_frame.pack(fill=tk.BOTH, side=tk.LEFT, expand=True)
 
-        scroll_frame = tk.Frame(master=entry_frame, bg="blue", width=10)
+        scroll_frame = tk.Frame(master=entry_frame, bg="", width=10)
         scroll_frame.pack(fill=tk.BOTH, side=tk.LEFT, expand=False)
 
         message_frame = tk.Frame(master=self, bg="yellow")
@@ -155,9 +154,6 @@ class MainApp(tk.Frame):
         self.username = simpledialog.askstring('Login', 'Enter username (can create one):')
         self.password = simpledialog.askstring('Login', 'Enter password (can create one):', show='*')
         self.server = simpledialog.askstring('Login', 'Enter Server IP:')
-        self.username = 'masonwongjohn1'
-        self.password = 'password'
-        self.server = '168.235.86.101'
         if not self.server:
             self.server = None
         self.recipient = None
@@ -167,24 +163,25 @@ class MainApp(tk.Frame):
         self.direct_messenger = DirectMessenger(self.server, self.username, self.password)
         file_path = pathlib.Path.cwd()
         file_name = f'{self.username}.dsu'
-        current_file_path = file_path / file_name
         self.current_file_path = file_path / file_name
-        print(current_file_path)
-        if current_file_path.exists():
-            self.profile = Profile(self.username, self.password)
-            self.profile.load_profile(current_file_path)
+        self.current_file_path = pathlib.Path(self.current_file_path)
+        if self.current_file_path.exists():
+            self.profile = Profile()
+            self.profile.load_profile(self.current_file_path)
         else:
             self.profile = Profile(self.username, self.password)
-            with open(current_file_path, 'x') as f:
+            with open(self.current_file_path, 'x') as f:
                 pass
-        with open(current_file_path, 'w') as f:
+        with open(self.current_file_path, 'w') as f:
             self.direct_messenger_local = DirectMessenger('168.235.86.101', self.username, self.password)
             content = self.direct_messenger_local.retrieve_all()
             content_dict = json.loads(content)
-            print(content_dict)
             for message in content_dict['response']['messages']:
                 self.profile._messages.append(message)
-        self.profile.save_profile(current_file_path)
+            for message in self.profile.sent_messages:
+                    if self.recipient == message['recipient']:
+                        self.profile.sent_messages.append(message['message'])
+        self.profile.save_profile(pathlib.Path(self.current_file_path))
         # After all initialization is complete,
         # call the _draw method to pack the widgets
         # into the root frame
@@ -194,11 +191,10 @@ class MainApp(tk.Frame):
     def send_message(self):
         # You must implement this!
         message = self.body.get_text_entry()
-        print(message)
         if message and self.recipient:
-            print('message and recipient')
             success = self.direct_messenger.send(message, self.recipient)
-            self.profile.sent_messages.append(message)
+            self.profile.sent_messages.append({'recipient': self.recipient, 'message': message})
+            self.profile.save_profile(pathlib.Path(self.current_file_path))
             if success:
                 self.body.insert_user_message(message)
                 self.body.set_text_entry("")
@@ -231,23 +227,26 @@ class MainApp(tk.Frame):
         self.profile = Profile(self.username, self.password)
         file_path = pathlib.Path.cwd()
         file_name = f'{self.username}.dsu'
-        current_file_path = file_path / file_name
         self.current_file_path = file_path / file_name
-        if current_file_path.exists():
+        if self.current_file_path.exists():
             self.profile = Profile(self.username, self.password)
-            self.profile.load_profile(current_file_path)
+            self.profile.load_profile(self.current_file_path)
         else:
             self.profile = Profile(self.username, self.password)
-            with open(current_file_path, 'x') as f:
+            with open(self.current_file_path, 'x') as f:
                 pass
-        with open(current_file_path, 'w') as f:
+        with open(self.current_file_path, 'w') as f:
             self.direct_messenger_local = DirectMessenger('168.235.86.101', self.username, self.password)
             content = self.direct_messenger_local.retrieve_all()
             content_dict = json.loads(content)
-            print(content_dict)
             for message in content_dict['response']['messages']:
                 self.profile._messages.append(message)
-        self.profile.save_profile(current_file_path)
+        my_list = self.body.posts_tree.get_children()
+        self.check_all()
+        self.body.entry_editor.delete('1.0', tk.END)
+        self.profile.save_profile(self.current_file_path)
+        for item in my_list:
+            self.body.posts_tree.delete(*f'{item}')
 
     def check_new(self):
         # You must implement this!
@@ -270,43 +269,32 @@ class MainApp(tk.Frame):
         old_messages = self.get_local_list()
         if self.recipient is None:
             for i in range(len(old_messages)):
-                contact = old_messages[i]['from']
-                if contact not in self.profile.friends:
-                    self.body.insert_contact(contact)
-                    self.profile.friends.append(contact)
-                    self.profile.save_profile(self.current_file_path)
+                self.contact = old_messages[i]['from']
+                if self.contact not in self.profile.friends:
+                    self.body.insert_contact(self.contact)
+                    self.profile.friends.append(self.contact)
         for i in range(len(old_messages)):
-            contact = old_messages[i]['from']
-            print(contact)
-            print(self.recipient)
-            if contact == self.recipient:
-                if contact not in self.profile.friends:
-                    self.body.insert_contact(contact)
-                    self.profile.friends.append(contact)
-                    self.profile.save_profile(self.current_file_path)
+            self.contact = old_messages[i]['from']
+            if self.contact == self.recipient:
+                if self.contact not in self.profile.friends:
+                    self.body.insert_contact(self.contact)
+                    self.profile.friends.append(self.contact)
                 self.body.insert_contact_message(old_messages[i]['message'])
+        self.profile.load_profile(pathlib.Path(self.current_file_path))
+        for message in self.profile.sent_messages:
+                    if self.recipient == message['recipient']:
+                        self.body.insert_user_message(message['message'])
+        self.profile.save_profile(self.current_file_path)
 
-    # def get_local_list(self):
-    #     print(self.current_file_path)
-    #     self.profile.load_profile(pathlib.Path(self.current_file_path))
-    #     my_list = self.profile._messages
-    #     print(my_list)
-    #     my_dict = {}
-    #     for item in my_list:
-    #         message = item['message']
-    #         sender = item['from']
-    #         my_dict[sender] = message
-    #     return my_dict
     def get_local_list(self):
-        print(self.current_file_path)
         self.profile.load_profile(pathlib.Path(self.current_file_path))
         my_list = self.profile._messages
-        print(my_list)
         my_dicts = []
         for item in my_list:
             message = item['message']
             sender = item['from']
             my_dicts.append({'message': message, 'from': sender})
+        
         return my_dicts
 
     def _draw(self):

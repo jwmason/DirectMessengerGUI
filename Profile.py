@@ -117,16 +117,6 @@ class Profile:
         p = Path(path)
 
         if p.exists() and p.suffix == '.dsu':
-            # try:
-            #     for message in self._messages:
-            #         f = open(p, 'r')
-            #         obj = json.load(f)
-            #         self.recipient = obj['from']
-            #         self.message = obj['message']
-            #         self.sender = obj['username']
-            #         f.close()
-            # except Exception as ex:
-            #     raise DsuProfileError(ex)
             for message in self._messages:
                 f = open(p, 'r')
                 obj = json.load(f)
@@ -134,5 +124,10 @@ class Profile:
                 self.message = obj['_messages'][0]['message']
                 self.sender = obj['username']
                 f.close()
+            for message in self.sent_messages:
+                f2 = open(p, 'r')
+                obj = json.load(f2)
+                self.sent = obj['message']
+                f2.close()
         else:
             raise DsuFileError()
