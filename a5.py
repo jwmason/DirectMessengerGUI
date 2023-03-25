@@ -2,7 +2,9 @@
 # masonjw1@uci.edu
 # 48567424
 
-from gui import run
+"""This function runs the GUI."""
+
+import gui
 
 if __name__ == '__main__':
-    run()
+    gui.run()

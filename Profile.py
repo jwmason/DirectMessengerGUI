@@ -7,7 +7,7 @@ in other modules"""
 
 
 import json
-import time
+import time as t
 from pathlib import Path
 
 
@@ -54,7 +54,7 @@ class Post(dict):
 
         # If timestamp has not been set, generate a new from time module
         if self._timestamp == 0:
-            self._timestamp = time.time()
+            self._timestamp = t.time()
 
     def get_entry(self):
         """This returns entry"""
@@ -100,13 +100,12 @@ class Profile:
 
     def save_profile(self, path: str) -> None:
         """This saves profile"""
-        p = Path(path)
+        my_path = Path(path)
 
-        if p.exists() and p.suffix == '.dsu':
+        if my_path.exists() and my_path.suffix == '.dsu':
             try:
-                f = open(p, 'w')
-                json.dump(self.__dict__, f)
-                f.close()
+                with open(my_path, 'w') as my_file:
+                    json.dump(self.__dict__, my_file)
             except Exception as ex:
                 raise DsuFileError("Error processing the DSU file.", ex)
         else:
@@ -114,20 +113,16 @@ class Profile:
 
     def load_profile(self, path: str) -> None:
         """This loads profile"""
-        p = Path(path)
+        my_path = Path(path)
 
-        if p.exists() and p.suffix == '.dsu':
+        if my_path.exists() and my_path.suffix == '.dsu':
             for message in self._messages:
-                f = open(p, 'r')
-                obj = json.load(f)
-                self.recipient = obj['_messages'][0]['from']
-                self.message = obj['_messages'][0]['message']
-                self.sender = obj['username']
-                f.close()
-            for message in self.sent_messages:
-                f2 = open(p, 'r')
-                obj = json.load(f2)
-                self.sent = obj['message']
-                f2.close()
+                with open(my_path, 'r') as myfile:
+                    obj = json.load(myfile)
+                    self.friends.append(obj['_messages'][0]['from'])
+                    self._messages.append(obj['_messages'][0]['message'])
+            for message in self.friends:
+                with open(my_path, 'r') as myfile:
+                    self.sent_messages.append(message)
         else:
             raise DsuFileError()

@@ -2,6 +2,8 @@
 # masonjw1@uci.edu
 # 48567424
 
+"""This function contains the classes to direct messaging"""
+
 import socket
 import json
 import ds_protocol
@@ -18,7 +20,7 @@ class DirectMessage:
 
 class DirectMessenger:
     """This class initiates the abiliy to direct message"""
-    def __init__(self, dsuserver=None, username=None, password=None) -> None:
+    def __init__(self, dsuserver=None, username=None, password=None) -> list:
         """This initiates the attributes of the class"""
         self.token = None
         self.dsuserver = dsuserver
@@ -41,7 +43,7 @@ class DirectMessenger:
                 self.token = ds_protocol.extract_json(resp)[0]
                 client.close()
         except (ValueError, ConnectionRefusedError, socket.error):
-            return []
+            pass
 
     def send(self, message: str, recipient: str) -> bool:
         """Sends direct message and returns true if message successfully sent,
@@ -52,7 +54,6 @@ class DirectMessenger:
                 client.connect((self.dsuserver, 3021))
 
                 msg = ds_protocol.directmessage(self.token, recipient, message)
-                timestamp = msg['directmessage']['timestamp']
                 send2 = client.makefile('w')
                 recv2 = client.makefile('r')
 
@@ -64,7 +65,9 @@ class DirectMessenger:
                 print('\nServer Response:', resp2)
                 client.close()
                 return True
-        except (socket.error, TypeError, ConnectionRefusedError):
+        except (socket.error, TypeError, ConnectionRefusedError,
+                json.JSONDecodeError, ValueError, Exception,
+                NameError, OSError, TimeoutError, AttributeError):
             return False
 
     def retrieve_new(self) -> list:
