@@ -7,6 +7,7 @@
 import unittest
 from Profile import Profile
 
+
 class TestProfile(unittest.TestCase):
     """This tests profile"""
     def test_profile(self):
