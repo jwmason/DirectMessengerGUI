@@ -39,7 +39,8 @@ class TestDirectMessenger(unittest.TestCase):
         self.dm.send(message, recipient)
         messages = self.dm.retrieve_new()
         self.assertIsInstance(messages, list)
-        self.assertTrue(all(isinstance(message, DirectMessage) for message in messages))
+        self.assertTrue(all(isinstance(message, DirectMessage)
+                            for message in messages))
 
     def test_retrieve_all(self):
         """This tests retrieving all messages"""
@@ -50,7 +51,8 @@ class TestDirectMessenger(unittest.TestCase):
         self.dm.send(recipient, message2)
         messages = self.dm.retrieve_all()
         self.assertIsInstance(messages, list)
-        self.assertTrue(all(isinstance(message, DirectMessage) for message in messages))
+        self.assertTrue(all(isinstance(message, DirectMessage)
+                            for message in messages))
 
 
 if __name__ == '__main__':

@@ -191,9 +191,8 @@ class MainApp(tk.Frame):
                                                           self.username,
                                                           self.password)
             content = self.direct_messenger_local.retrieve_all()
-            content_dict = json.loads(content)
-            for message in content_dict['response']['messages']:
-                self.profile._messages.append(message)
+            for message in content:
+                self.profile._messages.append({'message': message.message, 'recipient': message.recipient})
             for message in self.profile.sent_messages:
                 if self.recipient == message['recipient']:
                     self.profile.sent_messages.append(message['message'])
@@ -253,9 +252,8 @@ class MainApp(tk.Frame):
                                                           self.username,
                                                           self.password)
             content = self.direct_messenger_local.retrieve_all()
-            content_dict = json.loads(content)
-            for message in content_dict['response']['messages']:
-                self.profile._messages.append(message)
+            for message in content:
+                self.profile._messages.append(message.message)
         my_list = self.body.posts_tree.get_children()
         self.check_all()
         self.body.entry_editor.delete('1.0', tk.END)
@@ -266,14 +264,12 @@ class MainApp(tk.Frame):
     def check_new(self):
         """Checks new messages"""
         new_messages = self.direct_messenger.retrieve_new()
-        new_messages = json.loads(new_messages)
-        new_messages = new_messages['response']['messages']
         for message in new_messages:
-            contact = str(message['from'])
+            contact = str(message.recipient)
             if contact not in self.profile.friends:
                 self.profile.friends.append(contact)
                 self.profile.save_profile(self.current_file_path)
-                self.body.insert_contact(str(message['from']))
+                self.body.insert_contact(str(message['recipient']))
         self.root.after(1000, self.check_new)
 
     def check_all(self):
@@ -282,12 +278,12 @@ class MainApp(tk.Frame):
         old_messages = self.get_local_list()
         if self.recipient is None:
             for i in range(len(old_messages)):
-                self.contact = old_messages[i]['from']
+                self.contact = old_messages[i]['recipient']
                 if self.contact not in self.profile.friends:
                     self.body.insert_contact(self.contact)
                     self.profile.friends.append(self.contact)
         for i in range(len(old_messages)):
-            self.contact = old_messages[i]['from']
+            self.contact = old_messages[i]['recipient']
             if self.contact == self.recipient:
                 if self.contact not in self.profile.friends:
                     self.body.insert_contact(self.contact)
@@ -306,8 +302,8 @@ class MainApp(tk.Frame):
         my_dicts = []
         for item in my_list:
             message = item['message']
-            sender = item['from']
-            my_dicts.append({'message': message, 'from': sender})
+            sender = item['recipient']
+            my_dicts.append({'message': message, 'recipient': sender})
 
         return my_dicts
 

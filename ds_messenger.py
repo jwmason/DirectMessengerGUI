@@ -12,12 +12,11 @@ import ds_protocol
 class DirectMessage:
     """This class initiates the attributes
     of a direct message"""
-    def __init__(self, recipient=None, message=None, timestamp=None):
-        """This initiates th attributes"""
+    def __init__(self, recipient = None, message = None, timestamp = None):
+        """This initiates the attributes"""
         self.recipient = recipient
         self.message = message
         self.timestamp = timestamp
-
 
 class DirectMessenger:
     """This class initiates the abiliy to direct message"""
@@ -63,7 +62,6 @@ class DirectMessenger:
                 send2.flush()
                 resp2 = recv2.readline()[:-1]
 
-                print('\nServer Response:', resp2)
                 client.close()
                 return True
         except (socket.error, TypeError, ConnectionRefusedError,
@@ -93,7 +91,8 @@ class DirectMessenger:
 
                 direct_messages = []
                 for message in resp2['response']['messages']:
-                    direct_message = DirectMessage(message['from'],
+                    for message in resp2['response']['messages']:
+                        direct_message = DirectMessage(message['from'],
                                                    message['message'],
                                                    message['timestamp'])
                     direct_messages.append(direct_message)
