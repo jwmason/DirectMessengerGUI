@@ -2,24 +2,29 @@ import unittest
 from datetime import datetime
 from ds_messenger import DirectMessage, DirectMessenger
 
+
 class TestDirectMessage(unittest.TestCase):
-    
+    """This class tests direct message class"""
     def test_direct_message_init(self):
+        """This tests its attributes"""
         recipient = 'Mason'
         message = 'test message'
         timestamp = datetime.now()
-        
+
         dm = DirectMessage(recipient, message, timestamp)
-        
+
         self.assertEqual(dm.recipient, recipient)
         self.assertEqual(dm.message, message)
         self.assertEqual(dm.timestamp, timestamp)
+
 
 class TestDirectMessenger(unittest.TestCase):
     """This class tests all of DirectMessenger"""
     def setUp(self):
         """Sets up a test direct message"""
-        self.dm = DirectMessenger(dsuserver="168.235.86.101", username="masonwong123", password="password")
+        self.dm = DirectMessenger(dsuserver="168.235.86.101",
+                                  username="masonwong123",
+                                  password="password")
 
     def test_send_message(self):
         """This tests the send function"""
@@ -46,6 +51,7 @@ class TestDirectMessenger(unittest.TestCase):
         messages = self.dm.retrieve_all()
         self.assertTrue(messages, {"response": {"type": "ok", "messages": []}})
         self.assertTrue(messages, DirectMessage)
+
 
 if __name__ == '__main__':
     unittest.main()

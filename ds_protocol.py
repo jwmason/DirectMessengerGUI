@@ -10,6 +10,7 @@ from collections import namedtuple
 
 DataTuple = namedtuple('DataTuple', ['token'])
 
+
 class Post(dict):
     """
     The Post class is responsible for working with individual user posts.
@@ -52,6 +53,7 @@ class Post(dict):
 
     entry = property(get_entry, set_entry)
     timestamp = property(get_time, set_time)
+
 
 def extract_json(json_msg: str) -> DataTuple:
     '''
@@ -108,9 +110,14 @@ def server_response(resp):
 def directmessage(token, user=None, user_msg=None, messages=None):
     """This function returns parameters into json direct messaging format"""
     if token and user_msg and user and messages is None:
-        server_send = {"token":f"{token}", "directmessage": {"entry": f"{user_msg}","recipient":f"{user}", "timestamp": f"{Post(user_msg).get_time()}"}}
+        server_send = {"token": f"{token}",
+                       "directmessage":
+                           {"entry": f"{user_msg}",
+                            "recipient": f"{user}",
+                            "timestamp":
+                                f"{Post(user_msg).get_time()}"}}
     elif token and messages == 'new':
-        server_send = {"token":f"{token}", "directmessage": "new"}
+        server_send = {"token": f"{token}", "directmessage": "new"}
     elif token and messages == 'all':
-        server_send = {"token":f"{token}", "directmessage": "all"}
+        server_send = {"token": f"{token}", "directmessage": "all"}
     return server_send
