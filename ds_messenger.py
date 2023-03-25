@@ -89,8 +89,16 @@ class DirectMessenger:
                 send2.flush()
                 resp2 = recv2.readline()[:-1]
 
+                resp2 = json.loads(resp2)
+
+                direct_messages = []
+                for message in resp2['response']['messages']:
+                    direct_message = DirectMessage(message['from'],
+                                                   message['message'],
+                                                   message['timestamp'])
+                    direct_messages.append(direct_message)
                 client.close()
-                return resp2
+                return direct_messages
         except (socket.error, TypeError, ConnectionRefusedError):
             return []
 
@@ -111,7 +119,15 @@ class DirectMessenger:
                 send2.flush()
                 resp2 = recv2.readline()[:-1]
 
+                resp2 = json.loads(resp2)
+
+                direct_messages = []
+                for message in resp2['response']['messages']:
+                    direct_message = DirectMessage(message['from'],
+                                                   message['message'],
+                                                   message['timestamp'])
+                    direct_messages.append(direct_message)
                 client.close()
-                return resp2
+                return direct_messages
         except (socket.error, TypeError, ConnectionRefusedError):
             return []

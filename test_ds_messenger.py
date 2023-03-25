@@ -23,8 +23,8 @@ class TestDirectMessenger(unittest.TestCase):
     def setUp(self):
         """Sets up a test direct message"""
         self.dm = DirectMessenger(dsuserver="168.235.86.101",
-                                  username="masonwong123",
-                                  password="password")
+                                  username="mason",
+                                  password="wong")
 
     def test_send_message(self):
         """This tests the send function"""
@@ -38,19 +38,19 @@ class TestDirectMessenger(unittest.TestCase):
         message = "test message"
         self.dm.send(message, recipient)
         messages = self.dm.retrieve_new()
-        self.assertTrue(messages, {"response": {"type": "ok", "messages": []}})
-        self.assertTrue(messages, DirectMessage)
+        self.assertIsInstance(messages, list)
+        self.assertTrue(all(isinstance(message, DirectMessage) for message in messages))
 
     def test_retrieve_all(self):
         """This tests retrieving all messages"""
         recipient = "masonwong12345"
         message1 = "test message 1"
         message2 = "test message 2"
-        self.dm.send(message1, recipient)
-        self.dm.send(message2, recipient)
+        self.dm.send(recipient, message1)
+        self.dm.send(recipient, message2)
         messages = self.dm.retrieve_all()
-        self.assertTrue(messages, {"response": {"type": "ok", "messages": []}})
-        self.assertTrue(messages, DirectMessage)
+        self.assertIsInstance(messages, list)
+        self.assertTrue(all(isinstance(message, DirectMessage) for message in messages))
 
 
 if __name__ == '__main__':
