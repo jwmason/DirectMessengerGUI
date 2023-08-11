@@ -1,10 +1,9 @@
 # Mason Wong
 # masonjw1@uci.edu
-# 48567424
 
 Summary:
 Created modules that enables a program to send and receive direct messages to another user
-on the DSP platform. I incorporated these modules into a graphical user
+on any DSP platform. I incorporated these modules into a graphical user
 interface (GUI) using Tkinter that should allow any student to communicate with any
 other student in this class as long as they know each other usernames.
 
